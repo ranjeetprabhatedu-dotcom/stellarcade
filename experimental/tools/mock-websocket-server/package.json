@@ -8,12 +8,18 @@
     "mock-websocket-server": "./dist/server.js"
   },
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "ts-node server.ts",
+    "build": "node init && tsc",
+    "start": "node init && node dist/server.js",
+    "dev": "node init && ts-node server.ts",
     "test": "vitest run"
   },
-  "keywords": ["websocket", "mock", "multiplayer", "lobby", "game"],
+  "keywords": [
+    "websocket",
+    "mock",
+    "multiplayer",
+    "lobby",
+    "game"
+  ],
   "author": "StellarCade",
   "license": "MIT",
   "dependencies": {

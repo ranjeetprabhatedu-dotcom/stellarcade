@@ -7,12 +7,19 @@
     "auth-signature-linter": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
+    "build": "node init && tsc",
+    "start": "node init && node dist/index.js",
+    "dev": "node init && ts-node src/index.ts",
     "test": "vitest"
   },
-  "keywords": ["soroban", "stellar", "linter", "auth", "security", "static-analysis"],
+  "keywords": [
+    "soroban",
+    "stellar",
+    "linter",
+    "auth",
+    "security",
+    "static-analysis"
+  ],
   "author": "StellarCade",
   "license": "MIT",
   "dependencies": {

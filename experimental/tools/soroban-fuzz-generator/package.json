@@ -8,12 +8,20 @@
     "soroban-fuzz-generator": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/cli.js",
-    "dev": "ts-node cli.ts",
+    "build": "node init && tsc",
+    "start": "node init && node dist/cli.js",
+    "dev": "node init && ts-node cli.ts",
     "test": "vitest run"
   },
-  "keywords": ["soroban", "stellar", "fuzz", "fuzzing", "testing", "scval", "cli"],
+  "keywords": [
+    "soroban",
+    "stellar",
+    "fuzz",
+    "fuzzing",
+    "testing",
+    "scval",
+    "cli"
+  ],
   "author": "StellarCade",
   "license": "MIT",
   "dependencies": {
