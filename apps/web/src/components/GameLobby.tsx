@@ -6,7 +6,6 @@ import NetworkGuardBanner from "./NetworkGuardBanner";
 import WalletStatusCard from "./WalletStatusCard";
 import PrizePoolStateCard from "./PrizePoolStateCard";
 import { DataTable, type DataTableColumn } from "./DataTable";
-import { SkeletonPreset } from "./LoadingSkeletonSet";
 import TransactionDetailDrawer from "./TransactionDetailDrawer";
 import SectionHeader from "./SectionHeader";
 import { commandStore } from "./CommandPalette";
@@ -120,7 +119,7 @@ function readStoredLobbyContext(): LobbyContext | null {
 
 export const GameLobby: React.FC = () => {
   const [games, setGames] = useState<Game[]>(ONCHAIN_GAMES_CATALOG);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retrying, setRetrying] = useState(false);
   const [lastGamesSyncAt, setLastGamesSyncAt] = useState<number | null>(null);
@@ -236,7 +235,7 @@ export const GameLobby: React.FC = () => {
       networkSupport.isSupported,
       networkSupport.normalizedActual,
       wallet.lastUpdatedAt,
-      wallet.provider?.name,
+      wallet.provider,
       wallet.refreshState.phase,
     ],
   );
@@ -319,6 +318,8 @@ export const GameLobby: React.FC = () => {
     if (pendingTransaction) {
       setPendingActionChipDismissed(false);
     }
+    // Intentionally keyed on txHash/updatedAt so the chip re-appears only for a new or updated transaction.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingTransaction?.txHash, pendingTransaction?.updatedAt]);
 
   useEffect(() => {

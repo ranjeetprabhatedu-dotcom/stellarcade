@@ -329,6 +329,7 @@ function mapRpcError(err: unknown, timedOut: boolean): ApiClientError {
   });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- stub keeps the call-site signature for a future diagnostics hook
 function dispatchApiTrace(_data: unknown): void {
   // no-op stub for local diagnostics hook
 }
@@ -524,6 +525,7 @@ export class ApiClient {
 
   async deposit(
     input: WalletAmountRequest,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- part of the public client signature
     _opts?: ApiRequestOptions,
   ): Promise<ApiResult<DepositResponse>> {
     if (input.amount <= 0) {
@@ -537,6 +539,7 @@ export class ApiClient {
 
   async withdraw(
     input: WalletAmountRequest,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- part of the public client signature
     _opts?: ApiRequestOptions,
   ): Promise<ApiResult<WithdrawResponse>> {
     if (input.amount <= 0) {

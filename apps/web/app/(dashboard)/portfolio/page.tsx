@@ -123,7 +123,7 @@ export default function PortfolioPage() {
           toSymbol="USDC"
           exchangeRate={0.12}
           feePercent={0.3}
-          onSwap={(quote, amount) => {
+          onSwap={() => {
             // Swap preview callback
           }}
         />

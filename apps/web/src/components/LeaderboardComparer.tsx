@@ -122,6 +122,7 @@ export const LeaderboardComparer: React.FC<LeaderboardComparerProps> = ({
           {playerA && (
             <div className="leaderboard-comparer__player-info">
               {playerA.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- avatar URLs are arbitrary remote hosts not configured for next/image
                 <img src={playerA.avatarUrl} alt={playerA.name} className="leaderboard-comparer__avatar" />
               ) : (
                 <div className="leaderboard-comparer__avatar-placeholder">
@@ -167,6 +168,7 @@ export const LeaderboardComparer: React.FC<LeaderboardComparerProps> = ({
           {playerB && (
             <div className="leaderboard-comparer__player-info">
               {playerB.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- avatar URLs are arbitrary remote hosts not configured for next/image
                 <img src={playerB.avatarUrl} alt={playerB.name} className="leaderboard-comparer__avatar" />
               ) : (
                 <div className="leaderboard-comparer__avatar-placeholder">

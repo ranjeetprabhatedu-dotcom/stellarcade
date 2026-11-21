@@ -88,6 +88,7 @@ export const BadgeCarousel: React.FC<BadgeCarouselProps> = ({
             >
               <div className="badge-carousel__badge-frame">
                 {badge.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- badge URLs are arbitrary remote hosts not configured for next/image
                   <img src={badge.imageUrl} alt={badge.label} className="badge-carousel__badge-img" />
                 ) : (
                   <div className="badge-carousel__badge-placeholder">

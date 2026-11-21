@@ -61,6 +61,7 @@ pub enum DataKey {
     Epoch(u64),
     Position(Address),
     TotalStaked,
+    Claimed(u64, Address),
 }
 
 // ---------------------------------------------------------------------------
@@ -284,6 +285,10 @@ impl StakingRewards {
             return Err(Error::NoActiveEpoch);
         }
 
+        if storage::has_claimed(&env, epoch.epoch_id, &staker) {
+            return Ok(0);
+        }
+
         let position = storage::get_position(&env, &staker);
         if position.staked_amount == 0 {
             return Ok(0);
@@ -303,6 +308,7 @@ impl StakingRewards {
         if claimable <= 0 {
             return Ok(0);
         }
+        storage::set_claimed(&env, epoch.epoch_id, &staker, true);
 
         epoch.distributed_rewards = epoch
             .distributed_rewards
@@ -374,17 +380,19 @@ impl StakingRewards {
             };
         };
 
-        let projected_reward = if epoch.total_staked_snapshot > 0 && position.staked_amount > 0 {
-            position
-                .staked_amount
-                .checked_mul(PRECISION)
-                .and_then(|v| v.checked_div(epoch.total_staked_snapshot))
-                .and_then(|share| share.checked_mul(epoch.total_rewards))
-                .and_then(|v| v.checked_div(PRECISION))
-                .unwrap_or(0)
-        } else {
-            0
-        };
+        let already_claimed = storage::has_claimed(&env, epoch.epoch_id, &staker);
+        let projected_reward =
+            if !already_claimed && epoch.total_staked_snapshot > 0 && position.staked_amount > 0 {
+                position
+                    .staked_amount
+                    .checked_mul(PRECISION)
+                    .and_then(|v| v.checked_div(epoch.total_staked_snapshot))
+                    .and_then(|share| share.checked_mul(epoch.total_rewards))
+                    .and_then(|v| v.checked_div(PRECISION))
+                    .unwrap_or(0)
+            } else {
+                0
+            };
 
         let lifetime_projected_total = position.total_claimed.saturating_add(projected_reward);
 

@@ -1,5 +1,3 @@
-#![cfg(test)]
-
 use soroban_sdk::{
     testutils::{Address as _, Ledger},
     token, Address, BytesN, Env,
@@ -135,4 +133,90 @@ fn unrevealed_deposits_are_forfeited_on_settle() {
     // Seller: winning proceeds 120 * 95% = 114, plus forfeited 150.
     assert_eq!(s.token.balance(&s.seller), 114 + 150);
     assert_eq!(s.token.balance(&silent), 500 - 150);
+}
+
+#[test]
+fn settle_with_no_revealed_bids_forfeits_all_deposits_to_seller() {
+    let s = setup();
+    let unrevealed1 = Address::generate(&s.env);
+    let unrevealed2 = Address::generate(&s.env);
+    fund(&s, &unrevealed1, 400);
+    fund(&s, &unrevealed2, 600);
+
+    let id = create(&s);
+    s.client
+        .commit_bid(&id, &unrevealed1, &commit(&s, 100, &salt(&s.env, 5)), &150);
+    s.client
+        .commit_bid(&id, &unrevealed2, &commit(&s, 200, &salt(&s.env, 6)), &250);
+
+    // Skip directly past reveal window
+    s.env.ledger().with_mut(|l| l.timestamp = REVEAL_END);
+    let result = s.client.settle_auction(&id);
+
+    assert_eq!(result.winner, None);
+    assert_eq!(result.winning_bid, 0);
+    assert_eq!(result.seller_proceeds, 0);
+    assert_eq!(result.forfeited, 400); // 150 + 250
+    assert_eq!(s.token.balance(&s.seller), 400);
+    assert_eq!(s.token.balance(&unrevealed1), 250);
+    assert_eq!(s.token.balance(&unrevealed2), 350);
+}
+
+#[test]
+fn tie_highest_bid_awards_first_and_refunds_second() {
+    let s = setup();
+    let bidder1 = Address::generate(&s.env);
+    let bidder2 = Address::generate(&s.env);
+    fund(&s, &bidder1, 1_000);
+    fund(&s, &bidder2, 1_000);
+
+    let id = create(&s);
+    let salt1 = salt(&s.env, 10);
+    let salt2 = salt(&s.env, 11);
+
+    s.client
+        .commit_bid(&id, &bidder1, &commit(&s, 150, &salt1), &200);
+    s.client
+        .commit_bid(&id, &bidder2, &commit(&s, 150, &salt2), &200);
+
+    s.env.ledger().with_mut(|l| l.timestamp = BID_END);
+    s.client.reveal_bid(&id, &bidder1, &150, &salt1);
+    s.client.reveal_bid(&id, &bidder2, &150, &salt2);
+
+    s.env.ledger().with_mut(|l| l.timestamp = REVEAL_END);
+    let result = s.client.settle_auction(&id);
+
+    // First highest bidder wins
+    assert_eq!(result.winner, Some(bidder1.clone()));
+    assert_eq!(result.winning_bid, 150);
+
+    // Second tied bidder gets full deposit back: 50 excess on reveal + 150 on settle = 1,000
+    assert_eq!(s.token.balance(&bidder2), 1_000);
+    assert_eq!(s.token.balance(&bidder1), 1_000 - 150);
+}
+
+#[test]
+fn repeated_settle_and_reveal_are_rejected() {
+    let s = setup();
+    let bidder = Address::generate(&s.env);
+    fund(&s, &bidder, 500);
+
+    let id = create(&s);
+    let sl = salt(&s.env, 12);
+    s.client
+        .commit_bid(&id, &bidder, &commit(&s, 100, &sl), &150);
+
+    s.env.ledger().with_mut(|l| l.timestamp = BID_END);
+    s.client.reveal_bid(&id, &bidder, &100, &sl);
+
+    // Repeated reveal fails
+    let res = s.client.try_reveal_bid(&id, &bidder, &100, &sl);
+    assert_eq!(res, Err(Ok(Error::AlreadyRevealed)));
+
+    s.env.ledger().with_mut(|l| l.timestamp = REVEAL_END);
+    s.client.settle_auction(&id);
+
+    // Repeated settle fails
+    let res = s.client.try_settle_auction(&id);
+    assert_eq!(res, Err(Ok(Error::AlreadySettled)));
 }

@@ -45,8 +45,6 @@ export const QueueStateMiniPanel: React.FC<QueueStateMiniPanelProps> = ({
   title,
   context = "lobby",
   loading = false,
-  error,
-  onRefresh,
   className = "",
   testId = "queue-state-mini-panel",
 }) => {

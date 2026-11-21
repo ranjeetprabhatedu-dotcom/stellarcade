@@ -25,7 +25,9 @@ describe('Testnet deployment configuration', () => {
     expect(envValue('backend/.env.example', 'COIN_FLIP_CONTRACT_ID')).toBe(COIN_FLIP);
     expect(envValue('backend/.env.example', 'RANDOM_GENERATOR_CONTRACT_ID')).toBe(RANDOM_GENERATOR);
     expect(envValue('apps/web/.env.example', 'NEXT_PUBLIC_COIN_FLIP_CONTRACT_ID')).toBe(COIN_FLIP);
-    expect(envValue('apps/web/.env.example', 'NEXT_PUBLIC_RANDOM_GENERATOR_CONTRACT_ID')).toBe(RANDOM_GENERATOR);
+    expect(envValue('apps/web/.env.example', 'NEXT_PUBLIC_RANDOM_GENERATOR_CONTRACT_ID')).toBe(
+      RANDOM_GENERATOR
+    );
     expect(readme).toContain(COIN_FLIP);
     expect(readme).toContain(RANDOM_GENERATOR);
   });

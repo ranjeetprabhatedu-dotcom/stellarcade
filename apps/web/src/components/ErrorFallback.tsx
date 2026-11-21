@@ -19,6 +19,8 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   onRetry,
   onNavigateHome,
 }) => {
+  // Full reload on purpose: this renders after a crash, so the router state may be broken.
+  // eslint-disable-next-line @next/next/no-location-assign-relative-destination
   const handleNavigateHome = onNavigateHome ?? (() => window.location.assign('/'));
 
   const errorMessage =

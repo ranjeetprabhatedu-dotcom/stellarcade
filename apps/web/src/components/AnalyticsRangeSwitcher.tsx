@@ -53,8 +53,6 @@ export const AnalyticsRangeSwitcher: React.FC<AnalyticsRangeSwitcherProps> = ({
     .filter(Boolean)
     .join(" ");
 
-  const selectedRange = ranges.find((range) => range.id === selectedId);
-
   const handleRangeChange = (range: TimeRange) => {
     if (disabled || loading || range.disabled) return;
     onChange(range.id, range);

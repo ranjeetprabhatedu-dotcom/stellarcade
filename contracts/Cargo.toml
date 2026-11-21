@@ -30,6 +30,7 @@ members = [
     "challenge-ladder",
     "bonus-rotator",
     "coin-flip",
+    "contract-upgrade-timelock",
     "color-prediction",
     "comprehensive-test-suite",
     "contract-circuit-breaker",
@@ -149,7 +150,6 @@ exclude = [
     # documented) because `exclude` only takes effect for members not listed
     # explicitly in `members` above — they've been removed from `members`
     # too. Fix and re-add individually; don't bulk re-add.
-    "contract-upgrade-timelock",
     "daily-reward-emission",
     "escrow-ledger",
     "escrow-vault",

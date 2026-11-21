@@ -549,3 +549,56 @@ fn test_fallback_policy() {
     assert_eq!(policy.fallback_recipient, recipient);
     assert_eq!(policy.fallback_percentage, 10000);
 }
+
+#[test]
+fn test_policy_changes_preserve_accrued_fees_across_pause_and_withdraw() {
+    let (env, contract_id, admin, _) = setup_contract();
+    let client = FeeManagerContractClient::new(&env, &contract_id);
+    let game_id = symbol_short!("game1");
+    let recipient = Address::generate(&env);
+
+    // Initial policy: 250 bps (2.5%)
+    client.set_fee_config(&admin, &game_id, &250, &recipient);
+    let net1 = client.charge_fee(&game_id, &1_000i128, &None::<Address>);
+    assert_eq!(net1, 975);
+    assert_eq!(client.accrued_fees(&game_id), 25);
+
+    // Policy change to 500 bps (5.0%): previous accrued fees (25) must be preserved
+    client.set_fee_config(&admin, &game_id, &500, &recipient);
+    assert_eq!(client.accrued_fees(&game_id), 25);
+
+    // Accrue more fees under new policy: 500 bps on 2,000 -> 100 fee, net 1900
+    let net2 = client.charge_fee(&game_id, &2_000i128, &None::<Address>);
+    assert_eq!(net2, 1900);
+    assert_eq!(client.accrued_fees(&game_id), 125); // 25 + 100 preserved
+
+    // Pause contract
+    client.pause(&admin);
+
+    // Operations during pause are rejected
+    assert_eq!(
+        client.try_charge_fee(&game_id, &1_000i128, &None::<Address>),
+        Err(Ok(Error::ContractPaused))
+    );
+    assert_eq!(
+        client.try_withdraw_fees(&admin, &game_id, &None::<Address>, &Some(50i128)),
+        Err(Ok(Error::ContractPaused))
+    );
+
+    // Unpause contract
+    client.unpause(&admin);
+
+    // Partial withdraw: 50 withdrawn, remaining 75
+    let w_res = client.try_withdraw_fees(&admin, &game_id, &None::<Address>, &Some(50i128));
+    assert!(w_res.is_ok());
+    assert_eq!(client.accrued_fees(&game_id), 75);
+
+    // Full remaining withdraw
+    let w_res2 = client.try_withdraw_fees(&admin, &game_id, &None::<Address>, &None::<i128>);
+    assert!(w_res2.is_ok());
+    assert_eq!(client.accrued_fees(&game_id), 0);
+
+    // Retry withdraw on zero balance fails with InsufficientFees
+    let w_res3 = client.try_withdraw_fees(&admin, &game_id, &None::<Address>, &None::<i128>);
+    assert_eq!(w_res3, Err(Ok(Error::InsufficientFees)));
+}

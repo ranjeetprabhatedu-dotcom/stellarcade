@@ -108,6 +108,7 @@ export const GameLeaderboardPreviewCard: React.FC<GameLeaderboardPreviewCardProp
             </span>
             <span className="leaderboard-preview-card__avatar">
               {entry.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- avatar URLs are arbitrary remote hosts not configured for next/image
                 <img
                   src={entry.avatarUrl}
                   alt=""

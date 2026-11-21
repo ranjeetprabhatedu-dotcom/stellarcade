@@ -24,8 +24,6 @@ export function PreferenceDraftIndicator({
   sectionId = "preference",
   isSaving = false,
   disabled = false,
-  disabledReason,
-  lastModified,
   className = "",
 }: PreferenceDraftIndicatorProps): React.JSX.Element | null {
   if (!hasDraft) return null;

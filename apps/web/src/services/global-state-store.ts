@@ -70,7 +70,7 @@ export class GlobalStateStore {
     for (const s of this.subscribers) {
       try {
         s(this.state);
-      } catch (e) {
+      } catch {
         // swallow subscriber errors
       }
     }
@@ -108,7 +108,8 @@ export class GlobalStateStore {
           flags: { ...state.flags, [action.payload.key]: action.payload.value },
         };
       case "FLAGS_CLEAR": {
-        const { [action.payload.key]: _removed, ...rest } = state.flags;
+        const rest = { ...state.flags };
+        delete rest[action.payload.key];
         return { ...state, flags: rest };
       }
       case "OPTIMISTIC_PATCH":
@@ -120,7 +121,8 @@ export class GlobalStateStore {
           },
         };
       case "OPTIMISTIC_REVERT": {
-        const { [action.payload.key]: _r, ...rest } = state.optimisticPatches;
+        const rest = { ...state.optimisticPatches };
+        delete rest[action.payload.key];
         return { ...state, optimisticPatches: rest };
       }
       case "OPTIMISTIC_CLEAR":
@@ -212,7 +214,7 @@ export class GlobalStateStore {
       };
       // optimisticPatches intentionally not persisted
       localStorage.setItem(this.storageKey, JSON.stringify(payload));
-    } catch (e) {
+    } catch {
       // ignore persistence errors
     }
   }
@@ -245,7 +247,7 @@ export class GlobalStateStore {
         profile: parsed.profile ?? initialState.profile,
         pendingTransaction,
       };
-    } catch (e) {
+    } catch {
       return null;
     }
   }

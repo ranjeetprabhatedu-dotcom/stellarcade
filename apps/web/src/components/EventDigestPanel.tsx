@@ -78,8 +78,6 @@ export const EventDigestPanel: React.FC<EventDigestPanelProps> = ({
   status,
   title = "Recent Activity",
   maxItems = 20,
-  error,
-  onRetry,
   onClearAll,
   className = "",
   testId = "event-digest-panel",

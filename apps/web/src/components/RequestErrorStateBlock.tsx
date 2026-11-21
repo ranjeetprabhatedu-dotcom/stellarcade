@@ -96,7 +96,6 @@ export const RequestErrorStateBlock: React.FC<RequestErrorStateBlockProps> = ({
       role="alert"
       aria-live="assertive"
       aria-busy={isRetrying || undefined}
-      aria-disabled={disabled || undefined}
       data-testid={testId}
       data-state={isRetrying ? "retrying" : disabled ? "disabled" : "error"}
     >

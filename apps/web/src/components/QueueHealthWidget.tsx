@@ -70,9 +70,7 @@ export const QueueHealthWidget: React.FC<QueueHealthWidgetProps> = ({
   queueName = "Game Queue",
   size = "default",
   showDetails = false,
-  onRefresh,
   loading = false,
-  error,
   className = "",
   testId = "queue-health-widget",
 }) => {

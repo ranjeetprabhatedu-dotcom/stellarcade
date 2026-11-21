@@ -106,7 +106,6 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ commands, placeholder =
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, activeIndex, filteredCommands]);
 
   useEffect(() => {

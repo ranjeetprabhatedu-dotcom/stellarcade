@@ -1,6 +1,5 @@
 import {
   isConnected,
-  isAllowed,
   requestAccess,
   getAddress,
   getNetwork,

@@ -8,12 +8,20 @@
     "contract-state-pruner": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/cli.js",
-    "dev": "ts-node cli.ts",
+    "build": "node init && tsc",
+    "start": "node init && node dist/cli.js",
+    "dev": "node init && ts-node cli.ts",
     "test": "vitest run"
   },
-  "keywords": ["soroban", "stellar", "storage", "ttl", "rent", "expiration", "cli"],
+  "keywords": [
+    "soroban",
+    "stellar",
+    "storage",
+    "ttl",
+    "rent",
+    "expiration",
+    "cli"
+  ],
   "author": "StellarCade",
   "license": "MIT",
   "dependencies": {

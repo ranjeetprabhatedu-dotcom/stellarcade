@@ -57,3 +57,16 @@ pub fn get_total_staked(env: &Env) -> i128 {
 pub fn set_total_staked(env: &Env, amount: i128) {
     env.storage().instance().set(&DataKey::TotalStaked, &amount);
 }
+
+pub fn has_claimed(env: &Env, epoch_id: u64, staker: &Address) -> bool {
+    env.storage()
+        .persistent()
+        .get(&DataKey::Claimed(epoch_id, staker.clone()))
+        .unwrap_or(false)
+}
+
+pub fn set_claimed(env: &Env, epoch_id: u64, staker: &Address, claimed: bool) {
+    env.storage()
+        .persistent()
+        .set(&DataKey::Claimed(epoch_id, staker.clone()), &claimed);
+}

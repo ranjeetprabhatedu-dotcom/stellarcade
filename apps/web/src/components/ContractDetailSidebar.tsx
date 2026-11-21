@@ -22,7 +22,6 @@ export const ContractDetailSidebar: React.FC<ContractDetailSidebarProps> = ({
   className = "",
   testId = "contract-detail-sidebar",
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
   const [relatedContracts, setRelatedContracts] = useState<RelatedContract[]>([]);
 
   useEffect(() => {

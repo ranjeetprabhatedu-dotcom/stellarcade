@@ -9,7 +9,6 @@ import {
   Dices,
   Flame,
   Award,
-  Sparkles,
   History,
   ShieldCheck,
   Wallet,

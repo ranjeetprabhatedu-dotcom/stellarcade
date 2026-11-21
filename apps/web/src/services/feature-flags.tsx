@@ -72,7 +72,6 @@ export const FeatureFlagsProvider: React.FC<FeatureFlagsProviderProps> = ({ chil
       return parseFlagOverrides(process.env.NEXT_PUBLIC_FEATURE_FLAG_OVERRIDES);
     }
     return {};
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [flags, setFlags] = useState<FeatureFlags>(() => {

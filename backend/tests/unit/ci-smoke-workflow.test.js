@@ -4,7 +4,7 @@ const path = require('path');
 const repoRoot = path.resolve(__dirname, '../..', '..');
 const workflow = fs.readFileSync(
   path.join(repoRoot, '.github/workflows/testnet-smoke.yml'),
-  'utf8',
+  'utf8'
 );
 
 function topLevelBlock(name) {

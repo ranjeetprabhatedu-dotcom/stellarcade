@@ -8,12 +8,19 @@
     "contract-auth-checker": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
+    "build": "node init && tsc",
+    "start": "node init && node dist/index.js",
+    "dev": "node init && ts-node src/index.ts",
     "test": "vitest run"
   },
-  "keywords": ["soroban", "stellar", "auth", "authorization", "security", "cli"],
+  "keywords": [
+    "soroban",
+    "stellar",
+    "auth",
+    "authorization",
+    "security",
+    "cli"
+  ],
   "author": "StellarCade",
   "license": "MIT",
   "dependencies": {

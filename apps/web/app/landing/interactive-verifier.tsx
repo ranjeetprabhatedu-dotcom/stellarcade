@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, ShieldCheck, RefreshCw, ArrowRight, Key, Hash, Dices } from "lucide-react";
+import { CheckCircle2, ShieldCheck, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { verifyFairnessProof, type FairnessVerificationOutcome } from "@/utils/fairness-verifier";
 
@@ -13,7 +13,7 @@ export function InteractiveVerifierSandbox() {
   const [clientSeed, setClientSeed] = useState("GBZXN7PIRZGNMHGA72STUFIO-4921");
   const [nonce, setNonce] = useState(1);
   const [rangeSize, setRangeSize] = useState(2);
-  const [commitHash, setCommitHash] = useState(
+  const [commitHash] = useState(
     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   );
   const [result, setResult] = useState<FairnessVerificationOutcome | null>(null);

@@ -104,9 +104,9 @@ describePostgres('profile creation races on PostgreSQL (#1587)', () => {
     await User.create({ wallet_address: firstWallet, username: 'Alpha' }, db);
     await User.reserveWallet(secondWallet, db);
 
-    await expect(User.updateByWallet(secondWallet, { username: 'ALPHA' }, db)).rejects.toMatchObject(
-      { statusCode: 409, code: 'USERNAME_TAKEN' }
-    );
+    await expect(
+      User.updateByWallet(secondWallet, { username: 'ALPHA' }, db)
+    ).rejects.toMatchObject({ statusCode: 409, code: 'USERNAME_TAKEN' });
 
     const rows = await db('users').whereNotNull('username').select('*');
     expect(rows).toHaveLength(1);

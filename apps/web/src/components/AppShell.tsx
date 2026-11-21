@@ -1,7 +1,6 @@
 "use client";
 
-import React, { Suspense, useCallback, useEffect, useMemo } from "react";
-import Image from "next/image";
+import React, { Suspense, useCallback, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { I18nProvider, useI18n } from "../i18n/provider";
 import HeaderWalletControl from "./HeaderWalletControl";
@@ -126,7 +125,7 @@ const AppShellContent: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const pathname = usePathname();
   const router = useRouter();
   const route = useMemo(() => getAppRoute(pathname), [pathname]);
-  const walletStatus = useWalletStatus();
+  useWalletStatus();
 
   /*
    * Profile sync now goes through useProfile/profile-service rather than an

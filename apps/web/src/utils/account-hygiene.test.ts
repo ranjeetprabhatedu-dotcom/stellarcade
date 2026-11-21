@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { scanAccountHygiene, SAMPLE_HYGIENE_ACCOUNTS } from "./account-hygiene";
+import { scanAccountHygiene } from "./account-hygiene";
 
 describe("account-hygiene utility", () => {
   it("scans sample hygiene accounts and calculates reserve reclamation accurately", () => {

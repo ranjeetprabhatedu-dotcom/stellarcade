@@ -15,6 +15,7 @@ fn create_token<'a>(env: &'a Env, admin: &Address) -> (Address, StellarAssetClie
     (contract.address(), client)
 }
 
+#[allow(dead_code)]
 struct Setup<'a> {
     client: StakingRewardsClient<'a>,
     admin: Address,
@@ -47,6 +48,7 @@ fn setup(env: &Env) -> Setup<'_> {
     }
 }
 
+#[allow(dead_code)]
 fn tc<'a>(env: &'a Env, token: &Address) -> TokenClient<'a> {
     TokenClient::new(env, token)
 }
@@ -179,6 +181,7 @@ fn test_epoch_summary_after_partial_claim() {
     // and total_claimed updated
     let alice_proj = s.client.reward_projection(&alice);
     assert_eq!(alice_proj.total_claimed, 500);
+    assert_eq!(alice_proj.projected_reward, 0);
 
     // Bob's projection still shows 500 pending
     let bob_proj = s.client.reward_projection(&bob);
@@ -207,4 +210,48 @@ fn test_projection_zero_stake_in_epoch() {
     let summary = s.client.epoch_summary();
     assert_eq!(summary.total_staked_snapshot, 0);
     assert_eq!(summary.pending_carry_over, 200);
+}
+
+#[test]
+fn test_epoch_rollover_and_reject_repeated_claims() {
+    let env = Env::default();
+    let s = setup(&env);
+
+    let alice = Address::generate(&env);
+    s.staking_sac.mint(&alice, &1_000i128);
+    s.client.stake(&alice, &1_000i128);
+
+    // Epoch 0
+    s.reward_sac.mint(&s.admin, &500i128);
+    s.client.start_epoch(&s.admin, &500i128, &0u64);
+
+    let claimed0 = s.client.claim_rewards(&alice);
+    assert_eq!(claimed0, 500);
+
+    // Repeated claim in same epoch returns 0 and transfers nothing extra
+    let repeated = s.client.claim_rewards(&alice);
+    assert_eq!(repeated, 0);
+    assert_eq!(s.reward_sac.balance(&alice), 500);
+
+    // End epoch 0
+    s.client.end_epoch(&s.admin);
+
+    // Epoch 1 rollover: Alice is still staked from epoch 0
+    s.reward_sac.mint(&s.admin, &800i128);
+    s.client.start_epoch(&s.admin, &800i128, &0u64);
+
+    // In epoch 1, Alice projects 800 rewards
+    let proj1 = s.client.reward_projection(&alice);
+    assert_eq!(proj1.epoch_id, 1);
+    assert_eq!(proj1.projected_reward, 800);
+
+    // Alice claims epoch 1 rewards
+    let claimed1 = s.client.claim_rewards(&alice);
+    assert_eq!(claimed1, 800);
+    assert_eq!(s.reward_sac.balance(&alice), 1_300);
+
+    // Repeated claim in epoch 1 returns 0
+    let repeated1 = s.client.claim_rewards(&alice);
+    assert_eq!(repeated1, 0);
+    assert_eq!(s.reward_sac.balance(&alice), 1_300);
 }

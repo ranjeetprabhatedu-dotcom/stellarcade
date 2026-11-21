@@ -29,12 +29,12 @@ Generated from `contracts/Cargo.toml` and `#[test]` attributes in each crate's
 result whenever membership or test attributes change;
 `python3 scripts/contract_inventory.py --check` fails when this block is stale.
 
-- Workspace members: **134**
-- Effectively excluded crates: **20** (a crate listed in both
+- Workspace members: **135**
+- Effectively excluded crates: **19** (a crate listed in both
   `members` and `exclude` is a member, not an exclusion)
 - Crate directories containing a `Cargo.toml`: **154**
 
-**Excluded crates** (20): `higher-lower`, `merch-redemption`, `profile-perks`, `contract-upgrade-timelock`, `daily-reward-emission`, `escrow-ledger`, `escrow-vault`, `fanout-distributor`, `guild-progress`, `ladder-checkpoints`, `ladder-seasons`, `loot-crate`, `map-voting`, `mission-ledger`, `prize-router-v2`, `quest-ledger-v2`, `queue-rewards`, `squad-rewards`, `squad-roster`, `wallet-reserves`.
+**Excluded crates** (19): `higher-lower`, `merch-redemption`, `profile-perks`, `daily-reward-emission`, `escrow-ledger`, `escrow-vault`, `fanout-distributor`, `guild-progress`, `ladder-checkpoints`, `ladder-seasons`, `loot-crate`, `map-voting`, `mission-ledger`, `prize-router-v2`, `quest-ledger-v2`, `queue-rewards`, `squad-rewards`, `squad-roster`, `wallet-reserves`.
 
 #### Test attributes by crate
 
@@ -53,7 +53,7 @@ result whenever membership or test attributes change;
 | `attendance-pass` | member | 12 |
 | `badge-minter` | member | 14 |
 | `balance-management` | member | 10 |
-| `blind-auction` | member | 3 |
+| `blind-auction` | member | 6 |
 | `bonus-rotator` | member | 6 |
 | `bonus-vault` | member | 6 |
 | `bounty-escrow` | member | 8 |
@@ -72,7 +72,7 @@ result whenever membership or test attributes change;
 | `contract-metadata-registry` | member | 20 |
 | `contract-monitoring` | member | 9 |
 | `contract-role-registry` | member | 21 |
-| `contract-upgrade-timelock` | excluded | 9 |
+| `contract-upgrade-timelock` | member | 10 |
 | `creator-drops` | member | 9 |
 | `creator-escrow` | member | 5 |
 | `creator-royalties` | member | 11 |
@@ -86,7 +86,7 @@ result whenever membership or test attributes change;
 | `deployment-scripts` | member | 3 |
 | `dice-roll` | member | 34 |
 | `duel-engine` | member | 4 |
-| `dutch-auction` | member | 11 |
+| `dutch-auction` | member | 15 |
 | `dynamic-fee-policy` | member | 9 |
 | `emergency-pause` | member | 14 |
 | `epoch-scheduler` | member | 15 |
@@ -96,7 +96,7 @@ result whenever membership or test attributes change;
 | `exploit-prevention` | member | 36 |
 | `fanout-distributor` | excluded | 9 |
 | `fee-allocator` | member | 6 |
-| `fee-management` | member | 25 |
+| `fee-management` | member | 26 |
 | `fee-shield` | member | 4 |
 | `gas-optimization-analysis` | member | 2 |
 | `governance` | member | 29 |
@@ -170,7 +170,7 @@ result whenever membership or test attributes change;
 | `squad-rewards` | excluded | 3 |
 | `squad-roster` | excluded | 5 |
 | `staking` | member | 11 |
-| `staking-rewards` | member | 6 |
+| `staking-rewards` | member | 7 |
 | `streak-bonus` | member | 21 |
 | `streak-ladder` | member | 8 |
 | `team-prizes` | member | 9 |

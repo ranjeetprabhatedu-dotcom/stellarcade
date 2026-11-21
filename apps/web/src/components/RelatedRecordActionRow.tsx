@@ -37,11 +37,9 @@ export function RelatedRecordActionRow({
   icon,
   actions = [],
   onClick,
-  isLoading,
   isEmpty = false,
   emptyMessage = "No records found",
   disabled = false,
-  disabledReason,
   className = "",
   testId = "related-record-action-row",
 }: RelatedRecordActionRowProps): React.JSX.Element {

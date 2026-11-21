@@ -70,7 +70,6 @@ export const UserActivityTimeline: React.FC<UserActivityTimelineProps> = ({
   activities,
   loading = false,
   compact = false,
-  onActivityClick,
   maxItems,
   className = "",
   testId = "user-activity-timeline",

@@ -1,9 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{
-    contract, contractevent, contractimpl, contracttype,
-    Address, Env, Symbol,
-};
+use soroban_sdk::{contract, contractevent, contractimpl, contracttype, Address, Env, Symbol};
 
 // ── Storage Keys ─────────────────────────────────────────────────
 #[contracttype]
@@ -11,7 +8,7 @@ use soroban_sdk::{
 pub enum DataKey {
     Admin,
     MinDelay,
-    Upgrade(u64),       // upgrade_id → UpgradeRecord
+    Upgrade(u64), // upgrade_id → UpgradeRecord
     NextUpgradeId,
 }
 
@@ -112,9 +109,10 @@ impl ContractUpgradeTimelock {
             .instance()
             .get(&DataKey::NextUpgradeId)
             .unwrap_or(0);
-        env.storage()
-            .instance()
-            .set(&DataKey::NextUpgradeId, &upgrade_id.checked_add(1).expect("Overflow"));
+        env.storage().instance().set(
+            &DataKey::NextUpgradeId,
+            &upgrade_id.checked_add(1).expect("Overflow"),
+        );
 
         let record = UpgradeRecord {
             upgrade_id,
@@ -124,9 +122,16 @@ impl ContractUpgradeTimelock {
             eta,
             status: UpgradeStatus::Queued,
         };
-        env.storage().persistent().set(&DataKey::Upgrade(upgrade_id), &record);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Upgrade(upgrade_id), &record);
 
-        UpgradeQueued { upgrade_id, target_contract, eta }.publish(&env);
+        UpgradeQueued {
+            upgrade_id,
+            target_contract,
+            eta,
+        }
+        .publish(&env);
 
         upgrade_id
     }
@@ -147,7 +152,9 @@ impl ContractUpgradeTimelock {
         );
 
         record.status = UpgradeStatus::Cancelled;
-        env.storage().persistent().set(&DataKey::Upgrade(upgrade_id), &record);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Upgrade(upgrade_id), &record);
 
         UpgradeCancelled { upgrade_id }.publish(&env);
     }
@@ -171,9 +178,15 @@ impl ContractUpgradeTimelock {
         assert!(now >= record.eta, "Timelock has not elapsed");
 
         record.status = UpgradeStatus::Executed;
-        env.storage().persistent().set(&DataKey::Upgrade(upgrade_id), &record);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Upgrade(upgrade_id), &record);
 
-        UpgradeExecuted { upgrade_id, target_contract: record.target_contract }.publish(&env);
+        UpgradeExecuted {
+            upgrade_id,
+            target_contract: record.target_contract,
+        }
+        .publish(&env);
     }
 
     /// Read the state of an upgrade record.
@@ -190,14 +203,10 @@ impl ContractUpgradeTimelock {
     /// `Queued` status (executed or cancelled).  When `Some`, `is_ready` is
     /// `true` iff the current ledger timestamp has reached or passed `eta`.
     pub fn get_queued_upgrade(env: Env, upgrade_id: u64) -> Option<QueuedUpgradeView> {
-        let record: UpgradeRecord = match env
+        let record: UpgradeRecord = env
             .storage()
             .persistent()
-            .get(&DataKey::Upgrade(upgrade_id))
-        {
-            Some(r) => r,
-            None => return None,
-        };
+            .get(&DataKey::Upgrade(upgrade_id))?;
 
         if record.status != UpgradeStatus::Queued {
             return None;
@@ -247,6 +256,25 @@ mod test {
     }
 
     #[test]
+    fn test_queue_upgrade_requires_admin_auth() {
+        let env = Env::default();
+        env.mock_all_auths();
+        set_time(&env, 1000);
+
+        let admin = Address::generate(&env);
+        let target = Address::generate(&env);
+        let contract_id = env.register(ContractUpgradeTimelock, ());
+        let client = ContractUpgradeTimelockClient::new(&env, &contract_id);
+        client.init(&admin, &3600u64);
+
+        client.queue_upgrade(&target, &Symbol::new(&env, "HASH1"), &(1000 + 3600 + 1));
+
+        let auths = env.auths();
+        assert_eq!(auths.len(), 1);
+        assert_eq!(auths[0].0, admin);
+    }
+
+    #[test]
     fn test_queue_and_execute() {
         let env = Env::default();
         env.mock_all_auths();
@@ -255,16 +283,12 @@ mod test {
 
         let admin = Address::generate(&env);
         let target = Address::generate(&env);
-        let contract_id = env.register_contract(None, ContractUpgradeTimelock);
+        let contract_id = env.register(ContractUpgradeTimelock, ());
         let client = ContractUpgradeTimelockClient::new(&env, &contract_id);
 
-        client.init(&admin, &86400u64);  // 1 day delay
+        client.init(&admin, &86400u64); // 1 day delay
 
-        let uid = client.queue_upgrade(
-            &target,
-            &Symbol::new(&env, "HASH1"),
-            &(1000 + 86400 + 1),
-        );
+        let uid = client.queue_upgrade(&target, &Symbol::new(&env, "HASH1"), &(1000 + 86400 + 1));
 
         // Advance past eta
         set_time(&env, 1000 + 86400 + 100);
@@ -284,15 +308,11 @@ mod test {
 
         let admin = Address::generate(&env);
         let target = Address::generate(&env);
-        let contract_id = env.register_contract(None, ContractUpgradeTimelock);
+        let contract_id = env.register(ContractUpgradeTimelock, ());
         let client = ContractUpgradeTimelockClient::new(&env, &contract_id);
 
         client.init(&admin, &86400u64);
-        let uid = client.queue_upgrade(
-            &target,
-            &Symbol::new(&env, "H2"),
-            &(1000 + 86400 + 1),
-        );
+        let uid = client.queue_upgrade(&target, &Symbol::new(&env, "H2"), &(1000 + 86400 + 1));
 
         // Do NOT advance time
         client.execute_upgrade(&uid);
@@ -307,15 +327,11 @@ mod test {
 
         let admin = Address::generate(&env);
         let target = Address::generate(&env);
-        let contract_id = env.register_contract(None, ContractUpgradeTimelock);
+        let contract_id = env.register(ContractUpgradeTimelock, ());
         let client = ContractUpgradeTimelockClient::new(&env, &contract_id);
 
         client.init(&admin, &3600u64);
-        let uid = client.queue_upgrade(
-            &target,
-            &Symbol::new(&env, "H3"),
-            &(1000 + 3600 + 1),
-        );
+        let uid = client.queue_upgrade(&target, &Symbol::new(&env, "H3"), &(1000 + 3600 + 1));
 
         client.cancel_upgrade(&uid);
         let state = client.upgrade_state(&uid);
@@ -331,7 +347,7 @@ mod test {
 
         let admin = Address::generate(&env);
         let target = Address::generate(&env);
-        let contract_id = env.register_contract(None, ContractUpgradeTimelock);
+        let contract_id = env.register(ContractUpgradeTimelock, ());
         let client = ContractUpgradeTimelockClient::new(&env, &contract_id);
 
         client.init(&admin, &86400u64);
@@ -344,7 +360,7 @@ mod test {
         let env = Env::default();
         env.mock_all_auths();
         let admin = Address::generate(&env);
-        let contract_id = env.register_contract(None, ContractUpgradeTimelock);
+        let contract_id = env.register(ContractUpgradeTimelock, ());
         let client = ContractUpgradeTimelockClient::new(&env, &contract_id);
         client.init(&admin, &0u64);
         client.init(&admin, &0u64);
@@ -359,7 +375,7 @@ mod test {
         set_time(&env, 1000);
 
         let admin = Address::generate(&env);
-        let contract_id = env.register_contract(None, ContractUpgradeTimelock);
+        let contract_id = env.register(ContractUpgradeTimelock, ());
         let client = ContractUpgradeTimelockClient::new(&env, &contract_id);
         client.init(&admin, &3600u64);
 
@@ -376,7 +392,7 @@ mod test {
 
         let admin = Address::generate(&env);
         let target = Address::generate(&env);
-        let contract_id = env.register_contract(None, ContractUpgradeTimelock);
+        let contract_id = env.register(ContractUpgradeTimelock, ());
         let client = ContractUpgradeTimelockClient::new(&env, &contract_id);
         client.init(&admin, &3600u64);
 
@@ -398,7 +414,7 @@ mod test {
 
         let admin = Address::generate(&env);
         let target = Address::generate(&env);
-        let contract_id = env.register_contract(None, ContractUpgradeTimelock);
+        let contract_id = env.register(ContractUpgradeTimelock, ());
         let client = ContractUpgradeTimelockClient::new(&env, &contract_id);
         client.init(&admin, &3600u64);
 
@@ -416,7 +432,7 @@ mod test {
 
         let admin = Address::generate(&env);
         let target = Address::generate(&env);
-        let contract_id = env.register_contract(None, ContractUpgradeTimelock);
+        let contract_id = env.register(ContractUpgradeTimelock, ());
         let client = ContractUpgradeTimelockClient::new(&env, &contract_id);
         client.init(&admin, &3600u64);
 

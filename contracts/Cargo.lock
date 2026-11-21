@@ -2080,6 +2080,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "stellarcade-contract-upgrade-timelock"
+version = "0.1.0"
+dependencies = [
+ "soroban-sdk",
+]
+
+[[package]]
 name = "stellarcade-creator-drops"
 version = "0.1.0"
 dependencies = [

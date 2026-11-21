@@ -1,5 +1,3 @@
-#![cfg(test)]
-
 use soroban_sdk::{testutils::Address as _, testutils::Ledger, token, Address, Env};
 
 use crate::{DutchAuction, DutchAuctionClient, Error};
@@ -186,4 +184,63 @@ fn invalid_price_range_is_rejected() {
         .client
         .try_create_auction(&seller, &1, &100, &200, &start_ts, &DURATION);
     assert_eq!(result, Err(Ok(Error::InvalidPriceRange)));
+}
+
+#[test]
+fn buy_on_cancelled_auction_is_rejected() {
+    let s = setup();
+    let seller = Address::generate(&s.env);
+    let buyer = Address::generate(&s.env);
+    let id = create_default_auction(&s, &seller);
+    fund(&s, &buyer, 2_000);
+
+    s.env.ledger().with_mut(|l| l.timestamp += DURATION);
+    s.client.cancel_auction(&id, &seller);
+
+    let res = s.client.try_buy(&id, &buyer, &2_000);
+    assert_eq!(res, Err(Ok(Error::AuctionAlreadyCancelled)));
+    assert_eq!(s.token.balance(&buyer), 2_000);
+}
+
+#[test]
+fn cancel_on_settled_auction_is_rejected() {
+    let s = setup();
+    let seller = Address::generate(&s.env);
+    let buyer = Address::generate(&s.env);
+    let id = create_default_auction(&s, &seller);
+    fund(&s, &buyer, 2_000);
+
+    s.client.buy(&id, &buyer, &2_000);
+
+    s.env.ledger().with_mut(|l| l.timestamp += DURATION);
+    let res = s.client.try_cancel_auction(&id, &seller);
+    assert_eq!(res, Err(Ok(Error::AuctionAlreadySettled)));
+}
+
+#[test]
+fn pre_start_timestamp_price_is_start_price() {
+    let s = setup();
+    let seller = Address::generate(&s.env);
+    let future_start = s.env.ledger().timestamp() + 500;
+    let id = s.client.create_auction(
+        &seller,
+        &1,
+        &START_PRICE,
+        &FLOOR_PRICE,
+        &future_start,
+        &DURATION,
+    );
+
+    assert_eq!(s.client.get_current_price(&id), START_PRICE);
+}
+
+#[test]
+fn invalid_duration_zero_is_rejected() {
+    let s = setup();
+    let seller = Address::generate(&s.env);
+    let start_ts = s.env.ledger().timestamp();
+    let res = s
+        .client
+        .try_create_auction(&seller, &1, &START_PRICE, &FLOOR_PRICE, &start_ts, &0);
+    assert_eq!(res, Err(Ok(Error::InvalidDuration)));
 }
