@@ -4,9 +4,9 @@
   "description": "Load generator CLI for simulating concurrent match wagering transactions",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "node init && tsc",
     "test": "jest",
-    "dev": "ts-node cli.ts"
+    "dev": "node init && ts-node cli.ts"
   },
   "dependencies": {
     "@stellar/js-stellar-sdk": "^11.0.0",
