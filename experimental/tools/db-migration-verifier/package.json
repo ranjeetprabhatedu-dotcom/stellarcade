@@ -8,12 +8,18 @@
     "db-migration-verifier": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/cli.js",
-    "dev": "ts-node cli.ts",
+    "build": "node init && tsc",
+    "start": "node init && node dist/cli.js",
+    "dev": "node init && ts-node cli.ts",
     "test": "vitest run"
   },
-  "keywords": ["prisma", "schema", "migration", "verifier", "cli"],
+  "keywords": [
+    "prisma",
+    "schema",
+    "migration",
+    "verifier",
+    "cli"
+  ],
   "author": "StellarCade",
   "license": "MIT",
   "devDependencies": {

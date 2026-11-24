@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
-    "start": "tsx cli.ts"
+    "start": "node init && tsx cli.ts"
   },
   "devDependencies": {
     "tsx": "^4.19.0",

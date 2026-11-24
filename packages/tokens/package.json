@@ -2,7 +2,7 @@
   "name": "@stellarcade/tokens",
   "version": "0.1.0",
   "private": true,
-  "description": "Design tokens for StellarCade — the formalized source of truth for colors, spacing, and type extracted from the live frontend's CSS custom properties",
+  "description": "Design tokens for StellarCade \u2014 the formalized source of truth for colors, spacing, and type extracted from the live frontend's CSS custom properties",
   "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.js",
@@ -19,7 +19,7 @@
     "src/tokens.css"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "node init && tsup",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
